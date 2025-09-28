@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import SolanaWalletProvider from "@/components/providers/WalletProvider";
+import Header from "@/components/layout/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,23 +29,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Solana Dev Tool
-                </h1>
-              </div>
-              <nav className="flex space-x-8">
-                {/* Navigation items will be added here */}
-              </nav>
-            </div>
-          </div>
-        </header>
-        <main className="min-h-screen bg-gray-50">
-          {children}
-        </main>
+        <SolanaWalletProvider>
+          <Header />
+          <main className="min-h-screen bg-gray-50">
+            {children}
+          </main>
+        </SolanaWalletProvider>
       </body>
     </html>
   );

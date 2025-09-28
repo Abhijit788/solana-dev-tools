@@ -38,3 +38,12 @@ export interface SolanaTransaction {
   blockTime?: number;
   confirmationStatus: 'processed' | 'confirmed' | 'finalized';
 }
+
+// Wallet connection types
+export interface WalletContextState {
+  connected: boolean;
+  connecting: boolean;
+  disconnecting: boolean;
+  publicKey: string | null;
+  wallet: object | null;
+}
