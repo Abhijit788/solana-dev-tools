@@ -3,9 +3,7 @@ import {
   PublicKey,
   Transaction,
   TransactionInstruction,
-  SystemProgram,
   ComputeBudgetProgram,
-  LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
 import { createSolanaConnection } from './solanaClient';
 
@@ -198,7 +196,6 @@ export async function simulateTransaction(
       const consumedMatch = log.match(/consumed (\d+) of (\d+) compute units/);
       if (consumedMatch) {
         unitsConsumed = parseInt(consumedMatch[1]);
-        const requested = parseInt(consumedMatch[2]);
         
         // Add warnings for compute unit usage
         if (unitsConsumed > config.computeUnitLimit * 0.9) {
