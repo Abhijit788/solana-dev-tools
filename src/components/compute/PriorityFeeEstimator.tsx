@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   getRecentPrioritizationFees, 
@@ -12,9 +11,7 @@ import {
   lamportsToSol,
   getPriorityFeeRecommendation,
   estimateConfirmationTime,
-  isPriorityFeeDataStale,
-  type PriorityFeeEstimate,
-  type PriorityFeeStats
+  type PriorityFeeEstimate
 } from '@/lib/priorityFeeUtils';
 import { 
   Zap, 
@@ -77,18 +74,7 @@ export default function PriorityFeeEstimator({
     }
   }, []);
 
-  // Auto-refresh data every 30 seconds
-  useEffect(() => {
-    fetchPriorityFees();
-    
-    const interval = setInterval(() => {
-      if (feeData && isPriorityFeeDataStale(feeData.timestamp)) {
-        fetchPriorityFees();
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [fetchPriorityFees, feeData]);
+  // No automatic fetching - user must click to calculate
 
   // Notify parent of fee changes
   useEffect(() => {
@@ -109,21 +95,32 @@ export default function PriorityFeeEstimator({
         <CardTitle className="flex items-center gap-2">
           <Zap className="h-5 w-5" />
           Priority Fee Estimator
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={fetchPriorityFees}
-            disabled={isLoading}
-            className="ml-auto"
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          </Button>
         </CardTitle>
         <CardDescription>
           Optimize transaction costs with real-time network priority fee data
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Calculate Fees Button */}
+        <Button
+          onClick={fetchPriorityFees}
+          disabled={isLoading}
+          className="w-full"
+          size="lg"
+        >
+          {isLoading ? (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              Loading Network Data...
+            </>
+          ) : (
+            <>
+              <Zap className="mr-2 h-4 w-4" />
+              Calculate Priority Fees
+            </>
+          )}
+        </Button>
+
         {error && (
           <Alert variant="destructive">
             <Info className="h-4 w-4" />
@@ -294,21 +291,35 @@ export default function PriorityFeeEstimator({
               </div>
             </details>
 
-            {/* Data Info */}
-            <div className="text-xs text-gray-500 flex items-center gap-2">
-              <Clock className="h-3 w-3" />
-              <span>
-                Data from {feeData.stats.count} recent transactions
-                • Updated {new Date(feeData.timestamp).toLocaleTimeString()}
-              </span>
+            {/* Data Info and Refresh Button */}
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-gray-500 flex items-center gap-2">
+                <Clock className="h-3 w-3" />
+                <span>
+                  Data from {feeData.stats.count} recent transactions
+                  • Updated {new Date(feeData.timestamp).toLocaleTimeString()}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={fetchPriorityFees}
+                disabled={isLoading}
+                className="text-xs"
+              >
+                <RefreshCw className={`h-3 w-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
             </div>
           </>
         )}
 
-        {isLoading && (
+        {!feeData && !isLoading && !error && (
           <div className="text-center py-8">
-            <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-2" />
-            <p className="text-sm text-gray-500">Loading priority fee data...</p>
+            <Zap className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <p className="text-sm text-gray-500 mb-4">
+              Click &ldquo;Calculate Priority Fees&rdquo; to fetch real-time network data
+            </p>
           </div>
         )}
       </CardContent>

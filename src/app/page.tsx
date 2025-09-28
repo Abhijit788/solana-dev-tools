@@ -12,7 +12,6 @@ export default function Home() {
   const { transactions, isLoading, error, refresh } = useRecentTransactions(5);
   const [currentComputeUnits, setCurrentComputeUnits] = useState(1400);
   const [currentPriorityFee, setCurrentPriorityFee] = useState(0);
-  const [estimatedTotalCost, setEstimatedTotalCost] = useState(0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -153,7 +152,6 @@ export default function Home() {
         <div id="transaction-simulator" className="mt-8">
           <SimulateTransactionForm 
             onComputeUnitsChange={setCurrentComputeUnits}
-            onPriorityFeeUpdate={setCurrentPriorityFee}
             externalPriorityFee={currentPriorityFee > 0 ? currentPriorityFee : undefined}
           />
         </div>
@@ -162,9 +160,8 @@ export default function Home() {
         <div id="priority-fee-estimator" className="mt-8">
           <PriorityFeeEstimator 
             computeUnits={currentComputeUnits}
-            onPriorityFeeChange={(priorityFee, totalCost) => {
+            onPriorityFeeChange={(priorityFee) => {
               setCurrentPriorityFee(priorityFee);
-              setEstimatedTotalCost(totalCost);
             }}
           />
         </div>

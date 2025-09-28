@@ -18,13 +18,11 @@ import { Loader2, Play, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 
 interface SimulateTransactionFormProps {
   onComputeUnitsChange?: (computeUnits: number) => void;
-  onPriorityFeeUpdate?: (priorityFee: number) => void;
   externalPriorityFee?: number;
 }
 
 export default function SimulateTransactionForm({ 
   onComputeUnitsChange,
-  onPriorityFeeUpdate,
   externalPriorityFee
 }: SimulateTransactionFormProps = {}) {
   const { publicKey, connected } = useWallet();
