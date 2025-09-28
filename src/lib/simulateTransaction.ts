@@ -24,6 +24,82 @@ export interface SimulationResult {
 }
 
 /**
+ * Simulates a minimal transaction for wallets that don't exist or have no balance
+ */
+async function simulateMinimalTransaction(
+  wallet: PublicKey,
+  config: SimulationConfig,
+  connection: Connection
+): Promise<SimulationResult> {
+  try {
+    const transaction = new Transaction();
+    
+    // Add compute budget instruction
+    transaction.add(
+      ComputeBudgetProgram.setComputeUnitLimit({
+        units: config.computeUnitLimit,
+      })
+    );
+    
+    if (config.computeUnitPrice && config.computeUnitPrice > 0) {
+      transaction.add(
+        ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: config.computeUnitPrice,
+        })
+      );
+    }
+    
+    // Add only a memo instruction without requiring signatures
+    const memoInstruction = new TransactionInstruction({
+      keys: [],
+      programId: new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'),
+      data: Buffer.from('Simulation test - no signature required', 'utf8'),
+    });
+    transaction.add(memoInstruction);
+    
+    // Get recent blockhash
+    const { blockhash } = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = wallet;
+    
+    // Simulate without signature verification
+    const simulationResponse = await connection.simulateTransaction(transaction);
+    
+    if (simulationResponse.value.err) {
+      return {
+        success: false,
+        error: `Simulation failed: ${JSON.stringify(simulationResponse.value.err)}`,
+        logs: simulationResponse.value.logs || [],
+      };
+    }
+    
+    // Parse compute units from logs
+    let unitsConsumed = 0;
+    const logs = simulationResponse.value.logs || [];
+    
+    for (const log of logs) {
+      const consumedMatch = log.match(/consumed (\d+) of (\d+) compute units/);
+      if (consumedMatch) {
+        unitsConsumed = parseInt(consumedMatch[1]);
+        break;
+      }
+    }
+    
+    return {
+      success: true,
+      unitsConsumed,
+      logs,
+      fee: 5000, // Base fee estimate
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Minimal simulation failed',
+    };
+  }
+}
+
+/**
  * Builds a simple transaction with compute budget instructions for simulation
  */
 export async function buildSimulationTransaction(
@@ -48,15 +124,14 @@ export async function buildSimulationTransaction(
     );
   }
 
-  // Add a minimal dummy instruction - a simple memo or system program instruction
-  // Using a minimal system program instruction (transfer 0 lamports to self)
-  transaction.add(
-    SystemProgram.transfer({
-      fromPubkey: wallet,
-      toPubkey: wallet,
-      lamports: 0, // No actual transfer, just for simulation
-    })
-  );
+  // Add a minimal memo instruction that doesn't require account balance
+  // This is safer for simulation as it doesn't require the wallet to exist or have balance
+  const memoInstruction = new TransactionInstruction({
+    keys: [{ pubkey: wallet, isSigner: true, isWritable: false }],
+    programId: new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'), // Memo program
+    data: Buffer.from('Transaction simulation test', 'utf8'),
+  });
+  transaction.add(memoInstruction);
 
   return transaction;
 }
@@ -72,6 +147,21 @@ export async function simulateTransaction(
   try {
     const conn = connection || createSolanaConnection();
     
+    // Check if wallet account exists and has balance
+    try {
+      const accountInfo = await conn.getAccountInfo(wallet);
+      const balance = await conn.getBalance(wallet);
+      
+      if (!accountInfo || balance === 0) {
+        // Account doesn't exist or has no balance, use minimal simulation
+        console.log('Wallet has no balance, using minimal simulation');
+        return await simulateMinimalTransaction(wallet, config, conn);
+      }
+    } catch (error) {
+      console.warn('Could not check account info, trying minimal simulation:', error);
+      return await simulateMinimalTransaction(wallet, config, conn);
+    }
+    
     // Build the transaction
     const transaction = await buildSimulationTransaction(wallet, config);
     
@@ -84,9 +174,16 @@ export async function simulateTransaction(
     const simulationResponse = await conn.simulateTransaction(transaction);
 
     if (simulationResponse.value.err) {
+      // If main simulation fails, try minimal simulation as fallback
+      const errorString = JSON.stringify(simulationResponse.value.err);
+      if (errorString.includes('AccountNotFound') || errorString.includes('InsufficientFunds')) {
+        console.log('Main simulation failed with account issues, trying minimal simulation');
+        return await simulateMinimalTransaction(wallet, config, conn);
+      }
+      
       return {
         success: false,
-        error: `Simulation failed: ${JSON.stringify(simulationResponse.value.err)}`,
+        error: `Simulation failed: ${errorString}`,
         logs: simulationResponse.value.logs || [],
       };
     }
@@ -130,9 +227,25 @@ export async function simulateTransaction(
       warnings: warnings.length > 0 ? warnings : undefined,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown simulation error';
+    const conn = connection || createSolanaConnection();
+    
+    // Try minimal simulation as final fallback
+    if (errorMessage.includes('AccountNotFound') || errorMessage.includes('account not found')) {
+      console.log('Caught AccountNotFound error, trying minimal simulation');
+      try {
+        return await simulateMinimalTransaction(wallet, config, conn);
+      } catch (fallbackError) {
+        return {
+          success: false,
+          error: `Both simulations failed. Original: ${errorMessage}, Fallback: ${fallbackError instanceof Error ? fallbackError.message : 'Unknown error'}`,
+        };
+      }
+    }
+    
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown simulation error',
+      error: errorMessage,
     };
   }
 }
