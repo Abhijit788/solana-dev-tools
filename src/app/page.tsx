@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import TransactionList from "@/components/compute/TransactionList";
+import SimulateTransactionForm from "@/components/compute/SimulateTransactionForm";
 import { useRecentTransactions } from "@/hooks/useRecentTransactions";
 
 export default function Home() {
@@ -102,6 +103,11 @@ export default function Home() {
             error={error}
             onRefresh={refresh}
           />
+        </div>
+
+        {/* Transaction Simulator Section */}
+        <div className="mt-8">
+          <SimulateTransactionForm />
         </div>
 
         <div className="mt-12 text-center">
