@@ -36,7 +36,7 @@ export default function RootLayout({
       >
         <SolanaWalletProvider>
           <Header />
-          <main className="min-h-screen bg-gray-50">
+          <main className="min-h-screen bg-gray-900">
             {children}
           </main>
           <WalletErrorToast />

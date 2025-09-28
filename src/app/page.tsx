@@ -1,15 +1,21 @@
+'use client';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import TransactionList from "@/components/compute/TransactionList";
+import { useRecentTransactions } from "@/hooks/useRecentTransactions";
 
 export default function Home() {
+  const { transactions, isLoading, error, refresh } = useRecentTransactions(5);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-white mb-4">
             Welcome to Solana Developer Tool
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-300">
             A comprehensive suite of tools for Solana blockchain development
           </p>
         </div>
@@ -88,11 +94,21 @@ export default function Home() {
           </Card>
         </div>
 
+        {/* Recent Transactions Section */}
+        <div className="mt-12">
+          <TransactionList 
+            transactions={transactions}
+            isLoading={isLoading}
+            error={error}
+            onRefresh={refresh}
+          />
+        </div>
+
         <div className="mt-12 text-center">
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-300 mb-4">
             Get started by exploring the tools above or check out our documentation.
           </p>
-          <Button variant="outline">View Documentation</Button>
+          <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">View Documentation</Button>
         </div>
       </div>
     </div>
