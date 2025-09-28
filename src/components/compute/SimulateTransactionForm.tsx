@@ -16,7 +16,17 @@ import {
 } from '@/lib/simulateTransaction';
 import { Loader2, Play, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 
-export default function SimulateTransactionForm() {
+interface SimulateTransactionFormProps {
+  onComputeUnitsChange?: (computeUnits: number) => void;
+  onPriorityFeeUpdate?: (priorityFee: number) => void;
+  externalPriorityFee?: number;
+}
+
+export default function SimulateTransactionForm({ 
+  onComputeUnitsChange,
+  onPriorityFeeUpdate,
+  externalPriorityFee
+}: SimulateTransactionFormProps = {}) {
   const { publicKey, connected } = useWallet();
   const [computeUnitLimit, setComputeUnitLimit] = useState<string>('1400');
   const [computeUnitPrice, setComputeUnitPrice] = useState<string>('0');
@@ -33,6 +43,9 @@ export default function SimulateTransactionForm() {
       const validation = validateComputeUnitLimit(numValue);
       if (!validation.valid) {
         setInputError(validation.error || '');
+      } else {
+        // Notify parent component of compute units change
+        onComputeUnitsChange?.(numValue);
       }
     }
   };
@@ -47,7 +60,7 @@ export default function SimulateTransactionForm() {
     }
 
     const computeLimit = parseInt(computeUnitLimit);
-    const computePrice = parseInt(computeUnitPrice) || 0;
+    const computePrice = externalPriorityFee || parseInt(computeUnitPrice) || 0;
 
     const validation = validateComputeUnitLimit(computeLimit);
     if (!validation.valid) {
@@ -79,6 +92,7 @@ export default function SimulateTransactionForm() {
     const recommendedUnits = getRecommendedComputeUnits(preset);
     setComputeUnitLimit(recommendedUnits.toString());
     setInputError('');
+    onComputeUnitsChange?.(recommendedUnits);
   };
 
   const formatComputeUnits = (units: number) => {
@@ -176,11 +190,17 @@ export default function SimulateTransactionForm() {
             <Input
               id="computeUnitPrice"
               type="number"
-              value={computeUnitPrice}
+              value={externalPriorityFee || computeUnitPrice}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setComputeUnitPrice(e.target.value)}
               placeholder="0"
               min="0"
+              disabled={!!externalPriorityFee}
             />
+            {externalPriorityFee && (
+              <p className="text-xs text-blue-600">
+                Using priority fee from estimator below: {externalPriorityFee} μL
+              </p>
+            )}
           </div>
         </div>
 

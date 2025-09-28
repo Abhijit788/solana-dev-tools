@@ -1,13 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import TransactionList from "@/components/compute/TransactionList";
 import SimulateTransactionForm from "@/components/compute/SimulateTransactionForm";
+import PriorityFeeEstimator from "@/components/compute/PriorityFeeEstimator";
 import { useRecentTransactions } from "@/hooks/useRecentTransactions";
 
 export default function Home() {
   const { transactions, isLoading, error, refresh } = useRecentTransactions(5);
+  const [currentComputeUnits, setCurrentComputeUnits] = useState(1400);
+  const [currentPriorityFee, setCurrentPriorityFee] = useState(0);
+  const [estimatedTotalCost, setEstimatedTotalCost] = useState(0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -36,13 +41,35 @@ export default function Home() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Transaction Builder</CardTitle>
+              <CardTitle>Transaction Simulator</CardTitle>
               <CardDescription>
-                Build and simulate Solana transactions
+                Build and simulate Solana transactions with compute unit analysis
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">Coming Soon</Button>
+              <Button 
+                className="w-full" 
+                onClick={() => document.getElementById('transaction-simulator')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Use Simulator
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Transaction History</CardTitle>
+              <CardDescription>
+                View wallet transactions with compute unit analysis and fees
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                className="w-full" 
+                onClick={() => document.getElementById('transaction-history')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                View History
+              </Button>
             </CardContent>
           </Card>
 
@@ -72,6 +99,23 @@ export default function Home() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Priority Fee Calculator</CardTitle>
+              <CardDescription>
+                Real-time transaction cost estimation with network fee data
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                className="w-full" 
+                onClick={() => document.getElementById('priority-fee-estimator')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Calculate Fees
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Token Inspector</CardTitle>
               <CardDescription>
                 Inspect SPL tokens and their metadata
@@ -96,7 +140,7 @@ export default function Home() {
         </div>
 
         {/* Recent Transactions Section */}
-        <div className="mt-12">
+        <div id="transaction-history" className="mt-12">
           <TransactionList 
             transactions={transactions}
             isLoading={isLoading}
@@ -106,8 +150,23 @@ export default function Home() {
         </div>
 
         {/* Transaction Simulator Section */}
-        <div className="mt-8">
-          <SimulateTransactionForm />
+        <div id="transaction-simulator" className="mt-8">
+          <SimulateTransactionForm 
+            onComputeUnitsChange={setCurrentComputeUnits}
+            onPriorityFeeUpdate={setCurrentPriorityFee}
+            externalPriorityFee={currentPriorityFee > 0 ? currentPriorityFee : undefined}
+          />
+        </div>
+
+        {/* Priority Fee Estimator Section */}
+        <div id="priority-fee-estimator" className="mt-8">
+          <PriorityFeeEstimator 
+            computeUnits={currentComputeUnits}
+            onPriorityFeeChange={(priorityFee, totalCost) => {
+              setCurrentPriorityFee(priorityFee);
+              setEstimatedTotalCost(totalCost);
+            }}
+          />
         </div>
 
         <div className="mt-12 text-center">
