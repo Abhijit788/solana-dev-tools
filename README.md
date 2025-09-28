@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Solana Developer Tool
+
+A comprehensive suite of tools for Solana blockchain development built with Next.js, TypeScript, and Tailwind CSS.
+
+## Features
+
+- **Account Explorer**: Explore Solana accounts and their data
+- **Transaction Builder**: Build and simulate Solana transactions  
+- **Program Inspector**: Analyze Solana programs and their instructions
+- **Network Statistics**: View real-time Solana network metrics
+- **Token Inspector**: Inspect SPL tokens and their metadata
+- **Validator Tools**: Tools for Solana validators and staking
+
+## Project Structure
+
+```
+src/
+├── components/ui/      # Reusable UI components
+├── lib/               # Utility modules and helpers
+├── types/             # TypeScript interfaces and types
+├── config/            # Application and Solana network configuration
+├── hooks/             # Custom React hooks
+└── app/               # Next.js App Router pages and layouts
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- pnpm
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd solana-dev-tool
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+pnpm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Learn More
+### Build for Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The project includes configuration files for:
 
-## Deploy on Vercel
+- **Application**: `src/config/app.ts` - General app configuration
+- **Solana Networks**: `src/config/solana.ts` - Solana network endpoints and settings
+- **pnpm**: `.pnpmrc` - Package manager configuration with auto-install-peers
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project uses:
+
+- **Next.js 15** with App Router
+- **TypeScript** for type safety
+- **Tailwind CSS** for styling
+- **pnpm** for package management
+- **ESLint** for code linting
+
+### UI Components
+
+Reusable UI components are located in `src/components/ui/` and built with Tailwind CSS. Current components include:
+
+- Button - Customizable button component with multiple variants
+- Card - Flexible card component for content display
+
+### Utilities
+
+Common utilities and helpers are in `src/lib/utils.ts`, including:
+
+- `cn()` - Tailwind class merging utility
+- `formatNumber()` - Number formatting with suffixes
+- `formatSOL()` - SOL amount formatting
+- `truncateAddress()` - Address truncation for display
+
+### Custom Hooks
+
+Reusable React hooks are in `src/hooks/index.ts`:
+
+- `useLocalStorage` - Local storage state management
+- `useClipboard` - Clipboard operations
+- `useDebounce` - Value debouncing
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
