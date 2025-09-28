@@ -11,7 +11,13 @@ interface Toast {
 
 export default function WalletErrorToast() {
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const { wallet, connected, connecting } = useWallet();
+  const [mounted, setMounted] = useState(false);
+  const { wallet, connected } = useWallet();
+
+  // Prevent hydration issues by only rendering after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Auto-remove toasts after 5 seconds
   useEffect(() => {
@@ -31,18 +37,18 @@ export default function WalletErrorToast() {
     setToasts(prev => [...prev, toast]);
   };
 
-  // Listen for wallet connection changes
+  // Listen for wallet connection changes - only after component is mounted
   useEffect(() => {
-    if (wallet && !connected && !connecting) {
-      // Wallet failed to connect
-      addToast(`Failed to connect to ${wallet.adapter.name}. Make sure it's installed and unlocked.`, 'error');
-    } else if (wallet && connected) {
+    if (!mounted) return;
+    
+    // Only show toasts for actual connection attempts, not initial state
+    if (wallet && connected) {
       // Successfully connected
       addToast(`Successfully connected to ${wallet.adapter.name}!`, 'success');
     }
-  }, [wallet, connected, connecting]);
+  }, [wallet, connected, mounted]);
 
-  if (toasts.length === 0) return null;
+  if (!mounted || toasts.length === 0) return null;
 
   return (
     <div className="fixed top-4 right-4 space-y-2 z-50">

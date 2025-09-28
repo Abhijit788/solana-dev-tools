@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,12 @@ export default function WalletConnectButton() {
   const { wallet, connect, connecting, connected, disconnect, disconnecting } = useWallet();
   const { setVisible } = useWalletModal();
   const [isConnecting, setIsConnecting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only showing wallet-specific content after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleClick = async () => {
     try {
@@ -48,7 +54,8 @@ export default function WalletConnectButton() {
     if (connected) {
       return 'Disconnect';
     }
-    if (wallet) {
+    // Only show wallet-specific text after component has mounted to prevent hydration mismatch
+    if (mounted && wallet) {
       return `Connect ${wallet.adapter.name}`;
     }
     return 'Select Wallet';

@@ -77,9 +77,14 @@ export function useWalletBalance() {
   const { publicKey } = useWallet();
   const [balance, setBalance] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchBalance = useCallback(async () => {
-    if (!publicKey || !connection) {
+    if (!mounted || !publicKey || !connection) {
       setBalance(null);
       return;
     }
@@ -94,11 +99,13 @@ export function useWalletBalance() {
     } finally {
       setLoading(false);
     }
-  }, [connection, publicKey]);
+  }, [connection, publicKey, mounted]);
 
   useEffect(() => {
-    fetchBalance();
-  }, [fetchBalance]);
+    if (mounted) {
+      fetchBalance();
+    }
+  }, [fetchBalance, mounted]);
 
   return { balance, loading, refetch: fetchBalance };
 }

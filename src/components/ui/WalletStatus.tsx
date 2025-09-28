@@ -1,10 +1,23 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 
 export default function WalletStatus() {
   const { wallet, connected, connecting } = useWallet();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="text-sm text-gray-500">
+        Loading...
+      </div>
+    );
+  }
 
   if (connecting) {
     return (
