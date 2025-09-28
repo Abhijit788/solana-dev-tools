@@ -6,7 +6,7 @@ A comprehensive suite of tools for Solana blockchain development built with Next
 
 - **Wallet Integration**: Connect popular Solana wallets (Phantom, Solflare, Coinbase)
 - **Account Explorer**: Explore Solana accounts and their data
-- **Transaction Builder**: Build and simulate Solana transactions  
+- **Transaction Builder**: Build and simulate Solana transactions
 - **Program Inspector**: Analyze Solana programs and their instructions
 - **Network Statistics**: View real-time Solana network metrics
 - **Token Inspector**: Inspect SPL tokens and their metadata
@@ -31,23 +31,26 @@ src/
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - pnpm
 
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd solana-dev-tool
 ```
 
 2. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 3. Run the development server:
+
 ```bash
 pnpm dev
 ```

@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { truncateAddress } from '@/lib/utils';
 import { useWalletBalance } from '@/hooks';
+import WalletConnectButton from '@/components/ui/WalletConnectButton';
 
 export default function Header() {
   const { publicKey, connected } = useWallet();
@@ -43,7 +43,7 @@ export default function Header() {
             </nav>
             
             <div className="wallet-adapter-button-wrapper">
-              <WalletMultiButton />
+              <WalletConnectButton />
             </div>
           </div>
         </div>
