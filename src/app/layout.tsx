@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   description: "A comprehensive developer tool for Solana blockchain development",
 };
 
+// Suppress hydration warnings on body element due to browser extensions
+// that may modify DOM attributes before React hydration
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,6 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
         <SolanaWalletProvider>
           <Header />
