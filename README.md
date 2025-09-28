@@ -4,6 +4,7 @@ A comprehensive suite of tools for Solana blockchain development built with Next
 
 ## Features
 
+- **Wallet Integration**: Connect popular Solana wallets (Phantom, Solflare, Coinbase)
 - **Account Explorer**: Explore Solana accounts and their data
 - **Transaction Builder**: Build and simulate Solana transactions  
 - **Program Inspector**: Analyze Solana programs and their instructions
@@ -15,7 +16,10 @@ A comprehensive suite of tools for Solana blockchain development built with Next
 
 ```
 src/
-├── components/ui/      # Reusable UI components
+├── components/
+│   ├── ui/             # Reusable UI components
+│   ├── layout/         # Layout components (Header, Footer, etc.)
+│   └── providers/      # Context providers (WalletProvider, etc.)
 ├── lib/               # Utility modules and helpers
 ├── types/             # TypeScript interfaces and types
 ├── config/            # Application and Solana network configuration
@@ -97,6 +101,16 @@ Reusable React hooks are in `src/hooks/index.ts`:
 - `useLocalStorage` - Local storage state management
 - `useClipboard` - Clipboard operations
 - `useDebounce` - Value debouncing
+- `useWalletBalance` - Fetch and monitor Solana wallet balance
+
+### Wallet Integration
+
+The app includes full Solana wallet integration:
+
+- **Supported Wallets**: Phantom, Solflare, Coinbase Wallet
+- **Network**: Connected to Devnet by default
+- **Features**: Auto-connect, balance display, address truncation
+- **Components**: Header shows connection status, address, and balance
 
 ## Contributing
 
