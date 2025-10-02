@@ -94,6 +94,80 @@ pnpm build
 pnpm start
 ```
 
+## 🚀 Deployment
+
+### **Vercel (Recommended)**
+
+The easiest way to deploy your Solana Developer Tool:
+
+1. **Connect to Vercel:**
+
+   ```bash
+   # Install Vercel CLI (already included in devDependencies)
+   npx vercel login
+   ```
+
+2. **Deploy from GitHub:**
+
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Import your GitHub repository: `https://github.com/Abhijit788/solana-dev-tools`
+   - Vercel will auto-detect Next.js and configure everything
+
+3. **Environment Variables (in Vercel Dashboard):**
+
+   ```
+   NEXT_PUBLIC_SOLANA_NETWORK=devnet
+   NEXT_PUBLIC_APP_ENV=production
+   ```
+
+4. **Deploy:**
+   ```bash
+   npx vercel --prod
+   ```
+
+### **Alternative Deployment Options**
+
+#### **Netlify**
+
+```bash
+# Build command: pnpm build
+# Publish directory: .next
+# Environment variables: Same as Vercel
+```
+
+#### **Railway**
+
+```bash
+railway login
+railway new
+railway connect
+railway up
+```
+
+#### **Digital Ocean App Platform**
+
+- Connect your GitHub repository
+- Set build command: `pnpm build`
+- Set run command: `pnpm start`
+
+### **Environment Variables for Production**
+
+Copy `.env.example` to `.env.local` and configure:
+
+```bash
+# Required
+NEXT_PUBLIC_SOLANA_NETWORK=devnet
+NEXT_PUBLIC_APP_ENV=production
+
+# Optional - Custom RPC for better performance
+NEXT_PUBLIC_SOLANA_RPC_ENDPOINT=https://api.devnet.solana.com
+NEXT_PUBLIC_CUSTOM_RPC_ENDPOINT=https://your-custom-rpc.com
+
+# Optional - Analytics
+NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+```
+
 ## 🔧 Configuration & Technical Details
 
 ### **Network Configuration**

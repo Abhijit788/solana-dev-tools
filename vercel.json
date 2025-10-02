@@ -1,0 +1,17 @@
+{
+  "buildCommand": "pnpm build",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "outputDirectory": ".next",
+  "functions": {
+    "app/api/**/*.ts": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_SOLANA_NETWORK": "devnet",
+    "NEXT_PUBLIC_APP_ENV": "production"
+  },
+  "regions": ["iad1"]
+}

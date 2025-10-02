@@ -6,7 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "deploy": "pnpm build && npx vercel --prod",
+    "deploy:vercel": "npx vercel --prod",
+    "preview": "pnpm build && pnpm start",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -45,6 +49,7 @@
     "msw": "^2.11.3",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vercel": "^48.1.6"
   }
 }
