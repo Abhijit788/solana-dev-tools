@@ -7,7 +7,7 @@ import { useToast } from '../../hooks/use-toast';
 
 export default function WalletDropdown() {
   const [mounted, setMounted] = useState(false);
-  const { connected, publicKey, connecting, disconnecting } = useWallet();
+  const { connected, publicKey } = useWallet();
   const { toast } = useToast();
 
   useEffect(() => {

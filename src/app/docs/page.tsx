@@ -44,7 +44,7 @@ export default function Documentation() {
               <div className="space-y-2">
                 <h3 className="font-semibold text-white">1. Connect Your Wallet</h3>
                 <p className="text-gray-300 text-sm">
-                  Click "Connect Wallet" in the top right corner and select your preferred wallet (Phantom, Solflare, or Coinbase).
+                  Click &ldquo;Connect Wallet&rdquo; in the top right corner and select your preferred wallet (Phantom, Solflare, or Coinbase).
                 </p>
               </div>
               <div className="space-y-2">
@@ -85,7 +85,7 @@ export default function Documentation() {
               <div className="space-y-3">
                 <h3 className="font-semibold text-white">🔍 Transaction History</h3>
                 <p className="text-gray-300 text-sm">
-                  View your wallet's recent transactions with detailed analysis including:
+                  View your wallet&apos;s recent transactions with detailed analysis including:
                 </p>
                 <ul className="list-disc list-inside text-gray-400 text-sm space-y-1 ml-4">
                   <li>Compute units used vs allocated</li>
@@ -257,14 +257,14 @@ export default function Documentation() {
           <CardContent className="space-y-4">
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-white mb-2">Why can't I see my transactions?</h3>
+                <h3 className="font-semibold text-white mb-2">Why can&apos;t I see my transactions?</h3>
                 <p className="text-gray-300 text-sm">
-                  Make sure your wallet is connected and you're using the devnet. The tool currently works with Solana Devnet for development and testing purposes.
+                  Make sure your wallet is connected and you&apos;re using the devnet. The tool currently works with Solana Devnet for development and testing purposes.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold text-white mb-2">What does "Request timeout" mean?</h3>
+                <h3 className="font-semibold text-white mb-2">What does &ldquo;Request timeout&rdquo; mean?</h3>
                 <p className="text-gray-300 text-sm">
                   This typically occurs when the Solana devnet is experiencing high load or network issues. The tool will automatically retry, or you can refresh manually.
                 </p>

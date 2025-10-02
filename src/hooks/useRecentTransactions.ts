@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { ParsedTransactionWithMeta } from '@solana/web3.js';
+import { ParsedTransactionWithMeta, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { solanaConnection } from '@/lib/solanaClient';
 import { TransactionDetails, WalletTransactionHistory } from '@/types';
 import { useToast } from './use-toast';
@@ -140,7 +140,7 @@ export function useRecentTransactions(limit: number = 5): WalletTransactionHisto
       const signatures = await Promise.race([
         solanaConnection.getSignaturesForAddress(publicKey, { limit }),
         timeoutPromise
-      ]) as any[];
+      ]) as ConfirmedSignatureInfo[];
 
       if (signatures.length === 0) {
         console.log('No transaction signatures found for this wallet');
@@ -210,7 +210,7 @@ export function useRecentTransactions(limit: number = 5): WalletTransactionHisto
         });
       }
     }
-  }, [publicKey, connected, limit]);
+  }, [publicKey, connected, limit, toast]);
 
   useEffect(() => {
     // Small delay to prevent flickering on fast connections

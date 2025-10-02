@@ -152,7 +152,7 @@ export default function BatchTransactionBuilder() {
         description: "Batch configuration downloaded successfully",
         variant: "success",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Export Failed",
         description: "Failed to export batch configuration",
