@@ -1,128 +1,265 @@
 # Solana Developer Tool
 
-A comprehensive suite of tools for Solana blockchain development built with Next.js, TypeScript, and Tailwind CSS.
+A comprehensive suite of tools for Solana blockchain development built with Next.js 15, TypeScript, and Tailwind CSS. This application provides essential utilities for Solana developers including transaction analysis, fee estimation, and batch operations.
 
-## Features
+## 🚀 Current Features
 
-- **Wallet Integration**: Connect popular Solana wallets (Phantom, Solflare, Coinbase)
-- **Account Explorer**: Explore Solana accounts and their data
-- **Transaction Builder**: Build and simulate Solana transactions
-- **Program Inspector**: Analyze Solana programs and their instructions
-- **Network Statistics**: View real-time Solana network metrics
-- **Token Inspector**: Inspect SPL tokens and their metadata
-- **Validator Tools**: Tools for Solana validators and staking
+### **Available Tools**
 
-## Project Structure
+- **🔍 Transaction History**: View wallet transactions with detailed compute unit analysis, fee breakdowns, and transaction status
+- **⚡ Transaction Simulator**: Build and simulate Solana transactions with compute unit estimation before sending
+- **💰 Priority Fee Calculator**: Real-time transaction cost estimation based on current network conditions
+- **📦 Batch Transaction Builder**: Combine multiple instructions into optimized batches to reduce overall costs
+
+### **Core Features**
+
+- **🔐 Multi-Wallet Support**: Connect with Phantom, Solflare, and Coinbase Wallet
+- **🌐 Devnet Integration**: Safe development environment using Solana Devnet
+- **📱 Responsive Design**: Mobile-friendly interface with dark theme
+- **🔔 Toast Notifications**: Real-time feedback for user actions and errors
+- **📖 Comprehensive Documentation**: Built-in documentation with guides and FAQ
+- **🎨 Modern UI**: Clean, professional interface built with Radix UI components
+
+### **Coming Soon**
+
+- Account Explorer
+- Program Inspector
+- Network Statistics
+- Token Inspector
+- Validator Tools
+- RPC Health Monitor
+
+## 🏗️ Project Structure
 
 ```
 src/
+├── app/
+│   ├── docs/           # Documentation pages
+│   ├── layout.tsx      # Root layout with providers
+│   └── page.tsx        # Homepage with tool cards
 ├── components/
-│   ├── ui/             # Reusable UI components
-│   ├── layout/         # Layout components (Header, Footer, etc.)
-│   └── providers/      # Context providers (WalletProvider, etc.)
-├── lib/               # Utility modules and helpers
-├── types/             # TypeScript interfaces and types
-├── config/            # Application and Solana network configuration
-├── hooks/             # Custom React hooks
-└── app/               # Next.js App Router pages and layouts
+│   ├── ui/             # Reusable UI components (Button, Card, Toast, etc.)
+│   ├── layout/         # Layout components (Header with wallet integration)
+│   ├── providers/      # Context providers (WalletProvider)
+│   ├── compute/        # Transaction analysis components
+│   └── batch/          # Batch transaction tools
+├── hooks/
+│   ├── useRecentTransactions.ts  # Fetch and manage transaction data
+│   └── use-toast.ts             # Toast notification management
+├── lib/
+│   ├── solanaClient.ts # Solana connection with multiple endpoints
+│   └── utils.ts        # Utility functions
+├── mocks/              # MSW API mocking for development
+└── types/              # TypeScript interfaces
 ```
 
-## Getting Started
+## 🚦 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- pnpm
+- **Node.js 18+** (recommended: Node.js 20)
+- **pnpm** (recommended package manager)
+- **Solana Wallet Extension** (Phantom, Solflare, or Coinbase Wallet)
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Abhijit788/solana-dev-tools.git
 cd solana-dev-tool
 ```
 
-2. Install dependencies:
+2. **Install dependencies:**
 
 ```bash
 pnpm install
 ```
 
-3. Run the development server:
+3. **Run the development server:**
 
 ```bash
 pnpm dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+4. **Open your browser:**
+   - Navigate to [http://localhost:3001](http://localhost:3001)
+   - Connect your Solana wallet (Devnet)
+   - Start exploring the tools!
 
 ### Build for Production
 
 ```bash
 pnpm build
+pnpm start
 ```
 
-## Configuration
+## 🔧 Configuration & Technical Details
 
-The project includes configuration files for:
+### **Network Configuration**
 
-- **Application**: `src/config/app.ts` - General app configuration
-- **Solana Networks**: `src/config/solana.ts` - Solana network endpoints and settings
-- **pnpm**: `.pnpmrc` - Package manager configuration with auto-install-peers
+- **Default Network**: Solana Devnet (safe for testing)
+- **RPC Endpoints**: Multiple fallback endpoints for reliability
+- **Wallet Support**: Auto-detection of installed wallet extensions
 
-## Development
+### **Key Dependencies**
 
-This project uses:
+- **Next.js 15**: React framework with App Router
+- **@solana/wallet-adapter**: Wallet integration library
+- **@solana/web3.js**: Solana JavaScript SDK
+- **Radix UI**: Accessible component primitives
+- **Tailwind CSS**: Utility-first CSS framework
+- **TypeScript**: Static type checking
 
-- **Next.js 15** with App Router
-- **TypeScript** for type safety
-- **Tailwind CSS** for styling
-- **pnpm** for package management
-- **ESLint** for code linting
+### **Development Tools**
 
-### UI Components
+- **MSW (Mock Service Worker)**: API mocking for development
+- **ESLint**: Code linting and formatting
+- **Turbopack**: Fast development bundler
 
-Reusable UI components are located in `src/components/ui/` and built with Tailwind CSS. Current components include:
+## 💡 Usage Guide
 
-- Button - Customizable button component with multiple variants
-- Card - Flexible card component for content display
+### **Getting Started**
 
-### Utilities
+1. **Connect Wallet**: Click "Connect Wallet" in the header
+2. **Select Network**: Ensure you're on Solana Devnet
+3. **Explore Tools**: Use the tool cards to navigate to different features
 
-Common utilities and helpers are in `src/lib/utils.ts`, including:
+### **Transaction History**
 
-- `cn()` - Tailwind class merging utility
-- `formatNumber()` - Number formatting with suffixes
-- `formatSOL()` - SOL amount formatting
-- `truncateAddress()` - Address truncation for display
+- View your recent transactions with detailed analysis
+- See compute units used vs allocated
+- Monitor transaction fees and costs
+- Click transaction signatures to view on Solscan
 
-### Custom Hooks
+### **Transaction Simulator**
 
-Reusable React hooks are in `src/hooks/index.ts`:
+- Build custom transactions before sending
+- Estimate compute unit requirements
+- Calculate total transaction costs
+- Validate transaction structure
 
-- `useLocalStorage` - Local storage state management
-- `useClipboard` - Clipboard operations
-- `useDebounce` - Value debouncing
-- `useWalletBalance` - Fetch and monitor Solana wallet balance
+### **Priority Fee Calculator**
 
-### Wallet Integration
+- Get real-time network fee recommendations
+- Optimize transaction costs based on congestion
+- View historical fee trends
 
-The app includes full Solana wallet integration:
+### **Batch Transaction Builder**
 
-- **Supported Wallets**: Phantom, Solflare, Coinbase Wallet
-- **Network**: Connected to Devnet by default
-- **Features**: Auto-connect, balance display, address truncation
-- **Components**: Header shows connection status, address, and balance
+- Combine multiple operations efficiently
+- Reduce overall transaction costs
+- Optimize compute unit usage across instructions
 
-## Contributing
+## 🛠️ Development
+
+### **Key Components**
+
+#### **UI Components** (`src/components/ui/`)
+
+- `Button` - Customizable button with multiple variants
+- `Card` - Flexible card layout component
+- `Toast` - Notification system with dark theme
+- `Toaster` - Toast container and management
+
+#### **Feature Components**
+
+- `TransactionList` - Display and analyze transaction history
+- `SimulateTransactionForm` - Transaction simulation interface
+- `PriorityFeeEstimator` - Real-time fee calculation
+- `BatchTransactionBuilder` - Batch operation tools
+
+#### **Custom Hooks** (`src/hooks/`)
+
+- `useRecentTransactions` - Fetch and manage wallet transactions
+- `use-toast` - Toast notification management
+
+#### **Utilities** (`src/lib/`)
+
+- `solanaClient.ts` - Solana connection with fallback endpoints
+- `utils.ts` - Common utility functions for formatting and validation
+
+### **Wallet Integration**
+
+- **Auto-Connect**: Optional automatic wallet connection
+- **Error Handling**: Comprehensive error management with user feedback
+- **Network Detection**: Automatic network configuration
+- **Multi-Wallet**: Support for multiple wallet types simultaneously
+
+## 🔍 Troubleshooting
+
+### **Common Issues**
+
+**"Request timeout" errors:**
+
+- Devnet can be slow during high usage
+- Tool automatically retries with fallback endpoints
+- Manual refresh available in transaction history
+
+**Wallet connection issues:**
+
+- Ensure wallet extension is installed and unlocked
+- Try refreshing the page
+- Check that you're on the correct network (Devnet)
+
+**No transactions showing:**
+
+- Confirm wallet is connected to Devnet
+- Make sure you have recent transactions on Devnet
+- Check browser console for any connection errors
+
+### **Performance Tips**
+
+- Keep wallet extension updated
+- Use stable internet connection for best experience
+- Clear browser cache if experiencing issues
+
+## 🤝 Contributing
+
+We welcome contributions to improve the Solana Developer Tool! Here's how you can help:
+
+### **Getting Started**
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and test thoroughly
+4. Run linting: `pnpm lint`
+5. Build the project: `pnpm build`
+6. Commit your changes: `git commit -m 'Add amazing feature'`
+7. Push to the branch: `git push origin feature/amazing-feature`
+8. Open a Pull Request
 
-## License
+### **Development Guidelines**
 
-This project is licensed under the MIT License.
+- Follow TypeScript best practices
+- Maintain consistent code formatting
+- Add JSDoc comments for complex functions
+- Test your changes with different wallets
+- Ensure mobile responsiveness
+
+### **Areas for Contribution**
+
+- Additional wallet adapter support
+- New developer tools and features
+- Performance optimizations
+- UI/UX improvements
+- Documentation enhancements
+- Bug fixes and error handling
+
+## 📚 Resources
+
+- **[Live Demo](https://github.com/Abhijit788/solana-dev-tools)** - Try the tool online
+- **[Solana Documentation](https://docs.solana.com/)** - Official Solana developer docs
+- **[Wallet Adapter Docs](https://github.com/solana-labs/wallet-adapter)** - Wallet integration guide
+- **[Solscan Explorer](https://solscan.io/)** - Blockchain explorer for Solana
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Solana Labs** for the amazing blockchain platform
+- **Wallet Adapter Team** for seamless wallet integration
+- **Next.js Team** for the excellent React framework
+- **Radix UI** for accessible component primitives
