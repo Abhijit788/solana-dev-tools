@@ -70,8 +70,18 @@ export default function TransactionList({ transactions, isLoading, error, onRefr
           )}
         </div>
         <div className="text-red-400 text-center py-4">
-          <p>Failed to load transactions</p>
-          <p className="text-sm text-gray-400 mt-1">{error}</p>
+          <p>
+            {error.includes('timeout') || error.includes('slow') 
+              ? '⏱️ Devnet connection is slow' 
+              : '❌ Failed to load transactions'
+            }
+          </p>
+          <p className="text-sm text-gray-400 mt-1">
+            {error.includes('timeout') || error.includes('slow')
+              ? 'This is normal with devnet. Try refreshing in a moment.'
+              : error
+            }
+          </p>
         </div>
       </div>
     );

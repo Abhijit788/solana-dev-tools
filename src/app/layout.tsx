@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SolanaWalletProvider from "@/components/providers/WalletProvider";
+import { AppStateProvider } from "@/contexts/AppStateProvider";
+import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
-import WalletErrorToast from "@/components/ui/WalletErrorToast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,15 +33,18 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning={true}
       >
-        <SolanaWalletProvider>
-          <Header />
-          <main className="min-h-screen bg-gray-900">
-            {children}
-          </main>
-          <WalletErrorToast />
-        </SolanaWalletProvider>
+        <AppStateProvider>
+          <SolanaWalletProvider>
+            <div className="min-h-screen bg-gray-900 text-white font-sans antialiased">
+              <Header />
+              <main className="container mx-auto px-4 py-8">
+                {children}
+              </main>
+            </div>
+            <Toaster />
+          </SolanaWalletProvider>
+        </AppStateProvider>
       </body>
     </html>
   );

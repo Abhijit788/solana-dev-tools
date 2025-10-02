@@ -3,6 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { ParsedTransactionWithMeta } from '@solana/web3.js';
 import { solanaConnection } from '@/lib/solanaClient';
 import { TransactionDetails, WalletTransactionHistory } from '@/types';
+import { useToast } from './use-toast';
 
 /**
  * Parse compute units from transaction meta
@@ -106,6 +107,7 @@ function mapToTransactionDetails(transaction: ParsedTransactionWithMeta): Transa
  */
 export function useRecentTransactions(limit: number = 5): WalletTransactionHistory {
   const { publicKey, connected } = useWallet();
+  const { toast } = useToast();
   const [state, setState] = useState<WalletTransactionHistory>({
     publicKey: publicKey?.toString() || '',
     transactions: [],
@@ -129,19 +131,35 @@ export function useRecentTransactions(limit: number = 5): WalletTransactionHisto
     try {
       console.log('Fetching recent transactions for:', publicKey.toString());
       
-      // Get recent signatures
-      const signatures = await solanaConnection.getSignaturesForAddress(
-        publicKey,
-        { limit }
-      );
+      // Add timeout to prevent infinite loading - increased to 30 seconds for devnet
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout - devnet connection may be slow')), 30000);
+      });
+      
+      // Get recent signatures with timeout
+      const signatures = await Promise.race([
+        solanaConnection.getSignaturesForAddress(publicKey, { limit }),
+        timeoutPromise
+      ]) as any[];
 
       if (signatures.length === 0) {
+        console.log('No transaction signatures found for this wallet');
         setState(prev => ({
           ...prev,
           transactions: [],
           isLoading: false,
           error: null,
         }));
+        
+        // Show helpful toast for new users (only once)
+        if (!sessionStorage.getItem('shownNoTransactionsToast')) {
+          toast({
+            title: "No Transactions Found",
+            description: "This wallet has no transaction history on devnet. Try using the transaction simulator above!",
+            variant: "default",
+          });
+          sessionStorage.setItem('shownNoTransactionsToast', 'true');
+        }
         return;
       }
 
@@ -169,16 +187,38 @@ export function useRecentTransactions(limit: number = 5): WalletTransactionHisto
       }));
     } catch (error) {
       console.error('Failed to fetch transactions:', error);
+      const errorMessage = error instanceof Error 
+        ? error.message.includes('Request timeout') 
+          ? 'Devnet connection is slow. This is normal - try again in a moment.'
+          : error.message.includes('fetch')
+          ? 'Network connection issue. Please check your internet connection.'
+          : error.message
+        : 'Failed to fetch transactions';
+      
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch transactions',
+        error: errorMessage,
       }));
+      
+      // Only show error toast for non-timeout errors to avoid spam
+      if (!(error instanceof Error && error.message.includes('timeout'))) {
+        toast({
+          title: "Transaction Fetch Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     }
   }, [publicKey, connected, limit]);
 
   useEffect(() => {
-    fetchTransactions();
+    // Small delay to prevent flickering on fast connections
+    const timer = setTimeout(() => {
+      fetchTransactions();
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [fetchTransactions]);
 
   // Refresh function for manual updates

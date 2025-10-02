@@ -5,6 +5,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from '../../hooks/use-toast';
 import { 
   createBatchInstruction,
   simulateBatchTransaction,
@@ -30,6 +31,7 @@ import {
 
 export default function BatchTransactionBuilder() {
   const { publicKey, connected } = useWallet();
+  const { toast } = useToast();
   const [instructions, setInstructions] = useState<BatchInstruction[]>([]);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationResult, setSimulationResult] = useState<BatchSimulationResult | null>(null);
@@ -44,14 +46,25 @@ export default function BatchTransactionBuilder() {
       id: `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     };
     setInstructions(prev => [...prev, newInstruction]);
-  }, []);
+    toast({
+      title: "Instruction Added",
+      description: `Added ${type} instruction to batch`,
+      variant: "success",
+    });
+  }, [toast]);
 
   // Remove an instruction from the batch
   const removeInstruction = useCallback((id: string) => {
+    const instruction = instructions.find(instr => instr.id === id);
     setInstructions(prev => prev.filter(instr => instr.id !== id));
     setSimulationResult(null);
     setOptimizations([]);
-  }, []);
+    toast({
+      title: "Instruction Removed",
+      description: instruction ? `Removed ${instruction.type} instruction` : "Instruction removed from batch",
+      variant: "success",
+    });
+  }, [instructions, toast]);
 
   // Update instruction details
   const updateInstruction = useCallback((id: string, updates: Partial<BatchInstruction>) => {
@@ -63,7 +76,23 @@ export default function BatchTransactionBuilder() {
 
   // Simulate the batch transaction
   const simulateBatch = useCallback(async () => {
-    if (!connected || !publicKey || instructions.length === 0) return;
+    if (!connected || !publicKey) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (instructions.length === 0) {
+      toast({
+        title: "No Instructions",
+        description: "Add at least one instruction to simulate",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsSimulating(true);
     
@@ -75,29 +104,62 @@ export default function BatchTransactionBuilder() {
       const opts = optimizeBatchInstructions(instructions);
       setOptimizations(opts);
       setSelectedOptimization(opts.length > 0 ? 0 : -1);
+      
+      toast({
+        title: "Batch Simulation Complete",
+        description: `Simulated ${instructions.length} instruction${instructions.length > 1 ? 's' : ''}`,
+        variant: "success",
+      });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Batch simulation failed';
       console.error('Batch simulation failed:', error);
+      toast({
+        title: "Simulation Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsSimulating(false);
     }
-  }, [connected, publicKey, instructions]);
+  }, [connected, publicKey, instructions, toast]);
 
   // Export batch configuration
   const exportConfig = useCallback(() => {
-    if (!simulationResult) return;
+    if (!simulationResult) {
+      toast({
+        title: "No Simulation Data",
+        description: "Run a simulation first to export configuration",
+        variant: "destructive",
+      });
+      return;
+    }
     
-    const config = exportBatchConfig(instructions, simulationResult, optimizations);
-    const blob = new Blob([config], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `batch-transaction-config-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, [instructions, simulationResult, optimizations]);
+    try {
+      const config = exportBatchConfig(instructions, simulationResult, optimizations);
+      const blob = new Blob([config], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `batch-transaction-config-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Config Exported",
+        description: "Batch configuration downloaded successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export batch configuration",
+        variant: "destructive",
+      });
+    }
+  }, [instructions, simulationResult, optimizations, toast]);
 
   const formatComputeUnits = (units: number) => units.toLocaleString();
   const formatFee = (fee: number) => `${fee.toLocaleString()} lamports`;
@@ -120,7 +182,7 @@ export default function BatchTransactionBuilder() {
             <Plus className="h-4 w-4" />
             <span className="font-medium">Add Instructions</span>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
             {[
               { type: 'transfer' as const, label: 'SOL Transfer', icon: '💰' },
               { type: 'memo' as const, label: 'Memo', icon: '📝' },
@@ -133,6 +195,7 @@ export default function BatchTransactionBuilder() {
                 size="sm"
                 onClick={() => addInstruction(option.type)}
                 className="flex flex-col h-auto p-3"
+                aria-label={`Add ${option.label} instruction to batch`}
               >
                 <span className="text-lg mb-1">{option.icon}</span>
                 <span className="text-xs">{option.label}</span>
@@ -163,6 +226,7 @@ export default function BatchTransactionBuilder() {
                       }
                       className="font-medium bg-transparent border-none outline-none text-sm w-full"
                       placeholder="Instruction name"
+                      aria-label={`Name for ${instr.type} instruction`}
                     />
                     <div className="text-xs text-gray-500 mt-1">
                       {instr.type} • {formatComputeUnits(instr.estimatedComputeUnits)} CU
@@ -173,6 +237,7 @@ export default function BatchTransactionBuilder() {
                     size="sm"
                     onClick={() => removeInstruction(instr.id)}
                     className="text-red-500 hover:text-red-700"
+                    aria-label={`Remove ${instr.name || instr.type} instruction`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -188,6 +253,7 @@ export default function BatchTransactionBuilder() {
           disabled={isSimulating || !connected || instructions.length === 0}
           className="w-full"
           size="lg"
+          aria-label={isSimulating ? "Running batch simulation" : "Start batch transaction simulation"}
         >
           {isSimulating ? (
             <>

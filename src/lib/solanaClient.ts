@@ -1,9 +1,16 @@
 import { Connection, clusterApiUrl, Commitment } from '@solana/web3.js';
 import { SolanaConnectionConfig } from '@/types';
 
+// Alternative devnet endpoints for better reliability
+const DEVNET_ENDPOINTS = [
+  clusterApiUrl('devnet'),
+  'https://api.devnet.solana.com',
+  'https://devnet.helius-rpc.com/?api-key=demo', // Demo key for testing
+];
+
 // Default configuration for Solana connection
 const DEFAULT_CONFIG: SolanaConnectionConfig = {
-  endpoint: clusterApiUrl('devnet'),
+  endpoint: DEVNET_ENDPOINTS[0], // Primary endpoint
   commitment: 'confirmed',
 };
 

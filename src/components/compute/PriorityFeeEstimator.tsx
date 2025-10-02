@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from '../../hooks/use-toast';
 import { 
   getRecentPrioritizationFees, 
   calculateTransactionCost,
@@ -35,6 +36,7 @@ export default function PriorityFeeEstimator({
   onPriorityFeeChange,
   className = ''
 }: PriorityFeeEstimatorProps) {
+  const { toast } = useToast();
   const [feeData, setFeeData] = useState<PriorityFeeEstimate | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
@@ -67,12 +69,23 @@ export default function PriorityFeeEstimator({
     try {
       const data = await getRecentPrioritizationFees();
       setFeeData(data);
+      toast({
+        title: "Fees Updated",
+        description: `Loaded latest network priority fee data`,
+        variant: "success",
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch priority fees');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch priority fees';
+      setError(errorMessage);
+      toast({
+        title: "Fee Fetch Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   // No automatic fetching - user must click to calculate
 
@@ -107,6 +120,7 @@ export default function PriorityFeeEstimator({
           disabled={isLoading}
           className="w-full"
           size="lg"
+          aria-label={isLoading ? "Loading network fee data" : "Calculate priority fees from network"}
         >
           {isLoading ? (
             <>
@@ -131,7 +145,7 @@ export default function PriorityFeeEstimator({
         {feeData && (
           <>
             {/* Network Fee Statistics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
                   {feeData.stats.median}
@@ -164,7 +178,7 @@ export default function PriorityFeeEstimator({
                 <Gauge className="h-4 w-4" />
                 <span className="font-medium">Transaction Speed</span>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {[
                   { key: 'economy' as const, label: 'Economy', icon: '🐌', fee: getPriorityFeeRecommendation(feeData.stats, 'economy') },
                   { key: 'standard' as const, label: 'Standard', icon: '🚗', fee: getPriorityFeeRecommendation(feeData.stats, 'standard') },
@@ -180,6 +194,7 @@ export default function PriorityFeeEstimator({
                       setUseCustom(false);
                     }}
                     className="flex flex-col h-auto p-3"
+                    aria-label={`Select ${option.label} priority fee: ${option.fee} micro-lamports`}
                   >
                     <span className="text-lg mb-1">{option.icon}</span>
                     <span className="text-xs font-medium">{option.label}</span>

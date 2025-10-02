@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from '../../hooks/use-toast';
 import { 
   simulateTransaction, 
   validateComputeUnitLimit, 
@@ -26,6 +27,7 @@ export default function SimulateTransactionForm({
   externalPriorityFee
 }: SimulateTransactionFormProps = {}) {
   const { publicKey, connected } = useWallet();
+  const { toast } = useToast();
   const [computeUnitLimit, setComputeUnitLimit] = useState<string>('1400');
   const [computeUnitPrice, setComputeUnitPrice] = useState<string>('0');
   const [isSimulating, setIsSimulating] = useState(false);
@@ -50,9 +52,15 @@ export default function SimulateTransactionForm({
 
   const handleSimulate = async () => {
     if (!connected || !publicKey) {
+      const errorMessage = 'Please connect your wallet first';
       setSimulationResult({
         success: false,
-        error: 'Please connect your wallet first'
+        error: errorMessage
+      });
+      toast({
+        title: "Wallet Required",
+        description: errorMessage,
+        variant: "destructive",
       });
       return;
     }
@@ -63,6 +71,11 @@ export default function SimulateTransactionForm({
     const validation = validateComputeUnitLimit(computeLimit);
     if (!validation.valid) {
       setInputError(validation.error || '');
+      toast({
+        title: "Invalid Input",
+        description: validation.error || 'Please check your compute unit limit',
+        variant: "destructive",
+      });
       return;
     }
 
@@ -76,10 +89,30 @@ export default function SimulateTransactionForm({
       });
       
       setSimulationResult(result);
+      
+      if (result.success) {
+        toast({
+          title: "Simulation Successful",
+          description: `Consumed ${result.unitsConsumed?.toLocaleString()} compute units`,
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Simulation Failed",
+          description: result.error || 'Unknown error occurred',
+          variant: "destructive",
+        });
+      }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Simulation failed';
       setSimulationResult({
         success: false,
-        error: error instanceof Error ? error.message : 'Simulation failed'
+        error: errorMessage
+      });
+      toast({
+        title: "Simulation Error",
+        description: errorMessage,
+        variant: "destructive",
       });
     } finally {
       setIsSimulating(false);
@@ -162,7 +195,7 @@ export default function SimulateTransactionForm({
         </div>
 
         {/* Input Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="computeUnitLimit">Compute Unit Limit</Label>
             <Input
@@ -174,9 +207,11 @@ export default function SimulateTransactionForm({
               min="200"
               max="1400000"
               className={inputError ? 'border-red-500' : ''}
+              aria-describedby={inputError ? "compute-limit-error" : undefined}
+              aria-invalid={!!inputError}
             />
             {inputError && (
-              <p className="text-sm text-red-500">{inputError}</p>
+              <p id="compute-limit-error" className="text-sm text-red-500" role="alert">{inputError}</p>
             )}
           </div>
 
@@ -193,6 +228,7 @@ export default function SimulateTransactionForm({
               placeholder="0"
               min="0"
               disabled={!!externalPriorityFee}
+              aria-label="Compute unit price in micro-lamports"
             />
             {externalPriorityFee && (
               <p className="text-xs text-blue-600">
@@ -207,6 +243,7 @@ export default function SimulateTransactionForm({
           onClick={handleSimulate}
           disabled={isSimulating || !connected || !!inputError}
           className="w-full"
+          aria-label={isSimulating ? "Running simulation" : "Start transaction simulation"}
         >
           {isSimulating ? (
             <>
