@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import TransactionList from "@/components/compute/TransactionList";
 import SimulateTransactionForm from "@/components/compute/SimulateTransactionForm";
 import PriorityFeeEstimator from "@/components/compute/PriorityFeeEstimator";
+import BatchTransactionBuilder from "@/components/batch/BatchTransactionBuilder";
 import { useRecentTransactions } from "@/hooks/useRecentTransactions";
 
 export default function Home() {
@@ -98,6 +99,23 @@ export default function Home() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Batch Transaction Builder</CardTitle>
+              <CardDescription>
+                Combine multiple instructions into optimized batches to reduce costs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                className="w-full" 
+                onClick={() => document.getElementById('batch-builder')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Build Batches
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Priority Fee Calculator</CardTitle>
               <CardDescription>
                 Real-time transaction cost estimation with network fee data
@@ -164,6 +182,11 @@ export default function Home() {
               setCurrentPriorityFee(priorityFee);
             }}
           />
+        </div>
+
+        {/* Batch Transaction Builder Section */}
+        <div id="batch-builder" className="mt-8">
+          <BatchTransactionBuilder />
         </div>
 
         <div className="mt-12 text-center">
